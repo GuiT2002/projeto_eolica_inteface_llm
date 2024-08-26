@@ -59,8 +59,13 @@ def print_verbose(xk, *args):
     print(f"Current fitness: {-current_fitness}")
 
 def optimize_wind_farm():
-    # Definindo os parâmetros iniciais e limites
-    initial_params = np.random.uniform(-CIRCLE_RADIUS, CIRCLE_RADIUS, IND_SIZE * 2)
+    # Carregando as coordenadas iniciais do arquivo YAML
+    initial_params, _, _ = getTurbLocYAML("iea37-ex16.yaml")
+    initial_params = initial_params.flatten()  # Converter para o formato esperado
+    
+    # Lista para armazenar as soluções intermediárias
+    generations = []
+    
     bounds = [(-CIRCLE_RADIUS, CIRCLE_RADIUS)] * (IND_SIZE * 2)
     
     # Otimizando usando SciPy
@@ -69,22 +74,22 @@ def optimize_wind_farm():
         initial_params,
         method='L-BFGS-B',
         bounds=bounds,
-        callback=print_verbose  # Adicionando a função de callback
-        # options={
-        #    'maxiter': 10000,  # Número máximo de iterações elevado
-        #    'ftol': 1e-9,      # Tolerância muito baixa para mudanças na função objetivo
-        #    'gtol': 1e-9       # Tolerância muito baixa para o gradiente
-        #}
+        callback=lambda xk: generations.append(xk.copy()),  # Adicionando a solução intermediária
+        options={
+            'maxiter': 10000,  # Número máximo de iterações elevado
+            'ftol': 1e-9,      # Tolerância muito baixa para mudanças na função objetivo
+            'gtol': 1e-9       # Tolerância muito baixa para o gradiente
+        }
     )
 
     # Resultados da otimização
     optimized_params = result.x
     optimized_coords = np.array(optimized_params).reshape((IND_SIZE, 2))
     
-    return optimized_coords
+    return optimized_coords, generations
 
 def main():
-    optimized_coords = optimize_wind_farm()
+    optimized_coords, generations = optimize_wind_farm()
     
     print("Melhor solução:")
     print("Coordenadas X:", optimized_coords[:, 0])
@@ -93,6 +98,8 @@ def main():
     # Salva a solução da melhor resposta
     plot_solution(optimized_coords.flatten(), "final", IND_SIZE)
     
+    # Cria uma animação das soluções intermediárias
+    create_animation(generations, IND_SIZE, CIRCLE_RADIUS)
 
 if __name__ == "__main__":
     main()

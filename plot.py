@@ -8,8 +8,8 @@ def plot_solution(individual, generation_number, num_turbines=16):
         raise ValueError(f'O número de coordenadas ({len(individual)}) não corresponde ao número esperado de turbinas ({num_turbines * 2}).')
 
     # Extrai as coordenadas x e y
-    x_coords = individual[:num_turbines]
-    y_coords = individual[num_turbines:]
+    x_coords = np.array(individual[:num_turbines])
+    y_coords = np.array(individual[num_turbines:])
 
     # Configura a figura
     fig, ax = plt.subplots()
@@ -31,6 +31,7 @@ def plot_solution(individual, generation_number, num_turbines=16):
 
     # Adiciona uma grade e uma legenda
     ax.grid(True, linestyle='--', alpha=0.7)
+    ax.legend()
 
     # Salva o gráfico em um arquivo
     plt.savefig(f'wind_farm_solution_gen_{generation_number}.png', dpi=300)

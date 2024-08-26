@@ -12,14 +12,17 @@ creator.create("Individual", list, fitness=creator.FitnessMax)
 # Criando a toolbox
 toolbox = base.Toolbox()
 
-# Funções para criar indivíduos e população
+# Parâmetros
 IND_SIZE = 16  # Número de turbinas
 CIRCLE_RADIUS = 1300  # Raio do círculo
 
-def create_individual():
-    return creator.Individual([random.uniform(-CIRCLE_RADIUS, CIRCLE_RADIUS) for _ in range(IND_SIZE * 2)])
+def create_individual_from_coordinates(coords):
+    individual = creator.Individual(np.array(coords).flatten().tolist())
+    return individual
 
-toolbox.register("individual", create_individual)
+# Carregando coordenadas iniciais
+initial_coordinates, _, _ = getTurbLocYAML('iea37-ex16.yaml')
+toolbox.register("individual", create_individual_from_coordinates, coords=initial_coordinates.tolist())
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
 def is_within_circle(x, y, radius):
@@ -78,12 +81,13 @@ toolbox.register("select", tools.selTournament, tournsize=3)
 
 # Função de mutação modificada
 def mutate(individual, mu, sigma, indpb):
+    individual = np.array(individual)
     for i in range(len(individual)):
         if random.random() < indpb:
             individual[i] += random.gauss(mu, sigma)
             # Garantir que a turbina permaneça dentro do círculo
             enforce_circle(individual)
-    return individual,
+    return creator.Individual(individual.tolist()),
 
 toolbox.register("mutate", mutate, mu=0, sigma=50, indpb=0.2)  # Ajuste o sigma conforme necessário
 
@@ -92,23 +96,7 @@ def main():
     random.seed(42)
     
     # Configura o ambiente DEAP
-    num_turbines = 16  # Defina o número de turbinas
-    
-    creator.create("FitnessMax", base.Fitness, weights=(1.0,))
-    creator.create("Individual", list, fitness=creator.FitnessMax)
-    
-    toolbox = base.Toolbox()
-    toolbox.register("attr_float", random.uniform, -1300, 1300)  # Ajuste o intervalo se necessário
-    toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_float, n=num_turbines * 2)
-    toolbox.register("population", tools.initRepeat, list, toolbox.individual)
-    
-    # Registre os operadores genéticos e a função de avaliação
-    toolbox.register("evaluate", evaluate)  # Certifique-se de definir a função evaluate corretamente
-    toolbox.register("mate", tools.cxBlend, alpha=0.5)
-    toolbox.register("mutate", mutate, mu=0, sigma=50, indpb=0.2)  # Ajuste o sigma conforme necessário
-    toolbox.register("select", tools.selTournament, tournsize=3)
-    
-    pop = toolbox.population(n=50)
+    pop = toolbox.population(n=100)  # Aumenta o tamanho da população
     hof = tools.HallOfFame(1)
     stats = tools.Statistics(lambda ind: ind.fitness.values)
     stats.register("avg", np.mean)
@@ -116,14 +104,18 @@ def main():
     stats.register("min", np.min)
     stats.register("max", np.max)
 
-    for gen in range(50):
-        # Executa uma geração do algoritmo
-        algorithms.eaSimple(pop, toolbox, cxpb=0.5, mutpb=0.2, ngen=1, 
-                            stats=stats, halloffame=hof, verbose=True)
+    solutions = []
 
-    # Imprime as coordenadas da melhor solução
+    for gen in range(100):  # Aumenta o número de gerações
+        pop, logbook = algorithms.eaSimple(pop, toolbox, cxpb=0.7, mutpb=0.3, ngen=1, 
+                                           stats=stats, halloffame=hof, verbose=True)
+
+        best_individual = hof[0]
+        best_coords = np.array(best_individual).reshape((IND_SIZE, 2))
+        solutions.append(best_coords.copy())
+    
     best_individual = hof[0]
-    best_coords = np.array(best_individual).reshape((num_turbines, 2))
+    best_coords = np.array(best_individual).reshape((IND_SIZE, 2))
     x_coords = best_coords[:, 0]
     y_coords = best_coords[:, 1]
     
@@ -131,8 +123,7 @@ def main():
     print("Coordenadas X:", x_coords)
     print("Coordenadas Y:", y_coords)
 
-    # Salva a solução da melhor resposta
-    plot_solution(hof[0], "final", num_turbines)
+    create_animation(solutions, IND_SIZE, CIRCLE_RADIUS)
 
     return pop, stats, hof
 
