@@ -2,20 +2,13 @@ import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy as np
 
-def plot_solution(individual, generation_number, num_turbines=16):
-    # Verifique a estrutura do indivíduo
-    if len(individual) != num_turbines * 2:
-        raise ValueError(f'O número de coordenadas ({len(individual)}) não corresponde ao número esperado de turbinas ({num_turbines * 2}).')
-
-    # Extrai as coordenadas x e y
-    x_coords = np.array(individual[:num_turbines])
-    y_coords = np.array(individual[num_turbines:])
-
+def plot_solution(x,y):
+    
     # Configura a figura
     fig, ax = plt.subplots()
 
     # Plota as coordenadas das turbinas
-    ax.plot(x_coords, y_coords, 'bo', label='Turbine Locations', markersize=8)
+    ax.plot(x, y, 'bo', label='Turbine Locations', markersize=8)
 
     # Adiciona um círculo representando a fronteira
     circle = plt.Circle((0, 0), 1300, color='r', fill=False, linestyle='--', label='Boundary', linewidth=2)
@@ -27,14 +20,14 @@ def plot_solution(individual, generation_number, num_turbines=16):
     ax.set_aspect('equal', 'box')  # Mantém a proporção igual entre os eixos X e Y
     ax.set_xlabel('X Coordinate (m)')
     ax.set_ylabel('Y Coordinate (m)')
-    ax.set_title(f'Generation {generation_number}')
+    ax.set_title('Last generation' )
 
     # Adiciona uma grade e uma legenda
     ax.grid(True, linestyle='--', alpha=0.7)
-    ax.legend()
+    
 
     # Salva o gráfico em um arquivo
-    plt.savefig(f'wind_farm_solution_gen_{generation_number}.png', dpi=300)
+    plt.savefig('wind_farm_solution.png', dpi=300)
     plt.close()
 
 def create_animation(generations, num_turbines, radius):

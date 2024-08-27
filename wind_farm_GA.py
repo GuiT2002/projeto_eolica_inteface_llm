@@ -116,14 +116,15 @@ def main():
     
     best_individual = hof[0]
     best_coords = np.array(best_individual).reshape((IND_SIZE, 2))
-    x_coords = best_coords[:, 0]
-    y_coords = best_coords[:, 1]
+    x_coords = best_coords[:, 0].tolist()
+    y_coords = best_coords[:, 1].tolist()
     
     print("Melhor solução:")
     print("Coordenadas X:", x_coords)
     print("Coordenadas Y:", y_coords)
 
     create_animation(solutions, IND_SIZE, CIRCLE_RADIUS)
+    plot_solution(x_coords, y_coords)
 
     return pop, stats, hof
 

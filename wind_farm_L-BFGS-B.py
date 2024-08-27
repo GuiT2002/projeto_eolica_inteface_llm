@@ -92,11 +92,8 @@ def main():
     optimized_coords, generations = optimize_wind_farm()
     
     print("Melhor solução:")
-    print("Coordenadas X:", optimized_coords[:, 0])
-    print("Coordenadas Y:", optimized_coords[:, 1])
-    
-    # Salva a solução da melhor resposta
-    plot_solution(optimized_coords.flatten(), "final", IND_SIZE)
+    print("Coordenadas X:", optimized_coords[:, 0].tolist())
+    print("Coordenadas Y:", optimized_coords[:, 1].tolist())
     
     # Cria uma animação das soluções intermediárias
     create_animation(generations, IND_SIZE, CIRCLE_RADIUS)

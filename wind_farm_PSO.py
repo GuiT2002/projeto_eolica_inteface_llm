@@ -77,8 +77,8 @@ def main():
     best_coords, best_fitness, solutions = optimize_with_pso()
     
     print("Melhor solução:")
-    print("Coordenadas X:", best_coords[:, 0])
-    print("Coordenadas Y:", best_coords[:, 1])
+    print("Coordenadas X:", best_coords[:, 0].tolist())
+    print("Coordenadas Y:", best_coords[:, 1].tolist())
 
 
     # Cria uma animação com as soluções intermediárias
