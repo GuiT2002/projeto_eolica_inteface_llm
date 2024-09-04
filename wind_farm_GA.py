@@ -87,7 +87,7 @@ def mutate(individual, mu, sigma, indpb):
 
 # Operadores genéticos
 toolbox.register("mate", tools.cxBlend, alpha=0.5)
-toolbox.register("mutate", mutate, mu=0, sigma=50, indpb=0.2)  # Ajuste o sigma conforme necessário
+toolbox.register("mutate", mutate, mu=0, sigma=50, indpb=0.2) 
 toolbox.register("select", tools.selTournament, tournsize=3)
 toolbox.register("evaluate", evaluate)
 
