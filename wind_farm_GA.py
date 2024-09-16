@@ -86,8 +86,8 @@ def mutate(individual, mu, sigma, indpb):
 
 # Operadores genéticos
 toolbox.register("mate", tools.cxBlend, alpha=0.5)
-toolbox.register("mutate", mutate, mu=0, sigma=50, indpb=0.2) 
-toolbox.register("select", tools.selTournament, tournsize=4)
+toolbox.register("mutate", mutate, mu=0, sigma=100, indpb=0.2) 
+toolbox.register("select", tools.selTournament, tournsize=5)
 toolbox.register("evaluate", evaluate)
 
 # Configuração da otimização
@@ -99,7 +99,7 @@ def main():
     
     # Configura o ambiente DEAP
     toolbox.register("map", pool.map)  
-    pop = toolbox.population(n=500)  # Tamanho da população
+    pop = toolbox.population(n=250)  # Tamanho da população
     hof = tools.HallOfFame(1)  # Manter o melhor indivíduo
     stats = tools.Statistics(lambda ind: ind.fitness.values)
     stats.register("avg", np.mean)
@@ -111,7 +111,7 @@ def main():
     max_fitness_data = []
 
     # Loop principal de otimização
-    pop, logbook = algorithms.eaSimple(pop, toolbox, cxpb=0.8, mutpb=0.4, ngen=3500, 
+    pop, logbook = algorithms.eaSimple(pop, toolbox, cxpb=0.85, mutpb=0.3, ngen=3500, 
                                         stats=stats, halloffame=hof, verbose=True)
     
     # Fechando o pool para liberar os recursos
@@ -143,17 +143,18 @@ if __name__ == "__main__":
     pop, stats, hof = main()
 
 
-# cxpb=0.7,     mutpb=0.3,  pop=100,    torneio=2,  alpha=0.5,  gen=1000,    indpb=0.2,     simga=50,   -> ~411815MWh
-# cxpb=0.8,     mutpb=0.4,  pop=100,    torneio=2,  alpha=0.5,  gen=1000,    indpb=0.2,     simga=50,   -> ~411936MWh
-# cxpb=0.85,    mutpb=0.45, pop=100,    torneio=2,  alpha=0.5,  gen=1000,    indpb=0.2,     simga=50,   -> ~410619MWh
-# cxpb=0.8,     mutpb=0.4,  pop=250,    torneio=2,  alpha=0.5,  gen=1500,    indpb=0.2,     simga=50,   -> ~411012MWh
-# cxpb=0.8,     mutpb=0.4,  pop=250,    torneio=4,  alpha=0.5,  gen=1500,    indpb=0.2,     simga=50,   -> ~412294MWh - winner
-# cxpb=0.8,     mutpb=0.4,  pop=250,    torneio=5,  alpha=0.6,  gen=2500,    indpb=0.2,     simga=50,   -> ~410555MWh
-# cxpb=0.5,     mutpb=0.45, pop=250,    torneio=6,  alpha=0.6,  gen=1500,    indpb=0.35,    simga=50,   -> ~400872MWh
+# cxpb=0.7,     mutpb=0.3,  pop=100,    torneio=2,  alpha=0.5,  gen=1000,    indpb=0.2,     sigma=50,   -> ~411815MWh
+# cxpb=0.8,     mutpb=0.4,  pop=100,    torneio=2,  alpha=0.5,  gen=1000,    indpb=0.2,     sigma=50,   -> ~411936MWh
+# cxpb=0.85,    mutpb=0.45, pop=100,    torneio=2,  alpha=0.5,  gen=1000,    indpb=0.2,     sigma=50,   -> ~410619MWh
+# cxpb=0.8,     mutpb=0.4,  pop=250,    torneio=2,  alpha=0.5,  gen=1500,    indpb=0.2,     sigma=50,   -> ~411012MWh
+# cxpb=0.8,     mutpb=0.4,  pop=250,    torneio=4,  alpha=0.5,  gen=1500,    indpb=0.2,     sigma=50,   -> ~412294MWh 
+# cxpb=0.8,     mutpb=0.4,  pop=250,    torneio=5,  alpha=0.6,  gen=2500,    indpb=0.2,     sigma=50,   -> ~410555MWh
+# cxpb=0.5,     mutpb=0.45, pop=250,    torneio=6,  alpha=0.6,  gen=1500,    indpb=0.35,    sigma=50,   -> ~400872MWh
 # cxpb=0.8,     mutpb=0.4,  pop=250,    torneio=3,  alpha=0.5,  gen=2000,    indpb=0.15,    sigma=10,   -> ~407065MWh
 # cxpb=0.8,     mutpb=0.4,  pop=250,    torneio=4,  alpha=0.75, gen=1500,    indpb=0.3,     sigma=150,  -> ~409235MWh
 # cxpb=0.7,     mutpb=0.3,  pop=250,    torneio=4,  alpha=0.4,  gen=1500,    indpb=0.4,     sigma=150,  -> ~404785MWh
-# cxpb=0.8,     mutpb=0.4,  pop=500,    torneio=4,  alpha=0.5,  gen=3500,    indpb=0.2,     simga=50,   -> ~410847MWh
+# cxpb=0.8,     mutpb=0.4,  pop=500,    torneio=4,  alpha=0.5,  gen=3500,    indpb=0.2,     sigma=50,   -> ~410847MWh
+# cxpb=0.85,    mutpb=0.35, pop=250,    torneio=5,  alpha=0.5,  gen=3500,    indpb=0.2,     sigma=100,  -> ~412741MWh - winner
 
 #NÃO DESLIGUE O COMPUTADOR, VOLTAREI PRA DESLIGÁ-LO -> ITALO
 
