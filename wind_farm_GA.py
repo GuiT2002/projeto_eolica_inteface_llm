@@ -95,14 +95,14 @@ toolbox.register("evaluate", evaluate)
 def main():
     random.seed(42)
 
-    star_time = time.time()
+    start_time = time.time()
 
     # Criação do pool de processos
     pool = multiprocessing.Pool()
     
     # Configura o ambiente DEAP
     toolbox.register("map", pool.map)  
-    pop = toolbox.population(n=300)  # Tamanho da população
+    pop = toolbox.population(n=280)  # Tamanho da população
     hof = tools.HallOfFame(1)  # Manter o melhor indivíduo
     stats = tools.Statistics(lambda ind: ind.fitness.values)
     stats.register("avg", np.mean)
@@ -114,7 +114,7 @@ def main():
     max_fitness_data = []
 
     # Loop principal de otimização
-    pop, logbook = algorithms.eaSimple(pop, toolbox, cxpb=0.85, mutpb=0.35, ngen=3000, 
+    pop, logbook = algorithms.eaSimple(pop, toolbox, cxpb=0.85, mutpb=0.35, ngen=500, 
                                         stats=stats, halloffame=hof, verbose=True)
     
     # Fechando o pool para liberar os recursos
@@ -142,8 +142,8 @@ def main():
     save_logbook_to_csv(logbook, "set_12")
 
     end_time = time.time()
-    total_min = (star_time - end_time)//60
-    total_sec = (star_time - end_time)%60
+    total_min = int((end_time - start_time)//60)
+    total_sec = int((end_time - start_time)%60)
     print(f"Tempo de computação: {total_min}:{total_sec}")
 
 
@@ -165,8 +165,11 @@ if __name__ == "__main__":
 #10 cxpb=0.7,     mutpb=0.3,  pop=250,    torneio=4,  alpha=0.4,  gen=1500,    indpb=0.4,     sigma=150,  -> ~404785MWh
 #11 cxpb=0.8,     mutpb=0.4,  pop=500,    torneio=4,  alpha=0.5,  gen=3500,    indpb=0.2,     sigma=50,   -> ~410847MWh
 #12 cxpb=0.85,    mutpb=0.35, pop=250,    torneio=5,  alpha=0.5,  gen=3500,    indpb=0.2,     sigma=100,  -> ~412741MWh
-#13 cxpb=0.85,    mutpb=0.35, pop=300,    torneio=5,  alpha=0.5,  gen=500,     indpb=0.2,     sigma=100,  -> ~415203MWh - winner
+#13 cxpb=0.85,    mutpb=0.35, pop=300,    torneio=5,  alpha=0.5,  gen=500,     indpb=0.2,     sigma=100,  -> ~415203MWh
 #14 cxpb=0.85,    mutpb=0.35, pop=500,    torneio=5,  alpha=0.5,  gen=500,     indpb=0.2,     sigma=100,  -> ~411113MWh
 #15 cxpb=0.85,    mutpb=0.35, pop=400,    torneio=5,  alpha=0.5,  gen=500,     indpb=0.2,     sigma=100,  -> ~412403MWh
+#16 cxpb=0.85,    mutpb=0.35, pop=300,    torneio=5,  alpha=0.5,  gen=3000,    indpb=0.2,     sigma=100,  -> ~415289MWh - winner
+#17 cxpb=0.85,    mutpb=0.35, pop=350,    torneio=5,  alpha=0.5,  gen=2500,    indpb=0.2,     sigma=100,  -> ~410840MWh
+#18 cxpb=0.85,    mutpb=0.35, pop=310,    torneio=5,  alpha=0.5,  gen=500,     indpb=0.2,     sigma=100,  -> ~MWh
 
 #NÃO DESLIGUE O COMPUTADOR, VOLTAREI PRA DESLIGÁ-LO -> ITALO
