@@ -90,7 +90,7 @@ space = [
     Integer(100, 500, name='pop'),
     Integer(2, 6, name='torneio'),
     Real(0.4, 0.75, name='alpha'),
-    Integer(1000, 3500, name='gerações'),
+    Integer(600, 2000, name='gerações'),
     Real(0.1, 0.4, name='indpb'),
     Integer(10, 150, name='sigma')
 ]
@@ -138,8 +138,10 @@ def main(cxpb, mutpb, pop, torneio, alpha, gerações, indpb, sigma):
 def objective(cxpb, mutpb, pop, torneio, alpha, gerações, indpb, sigma):
     return -main(cxpb, mutpb, pop, torneio, alpha, gerações, indpb, sigma)
 
+x0 = [0.85, 0.35, 300, 5, 0.5, 600, 0.2, 100]
+
 # Otimização
-res = gp_minimize(objective, space, n_calls=100, random_state=42)
+res = gp_minimize(objective, space, n_calls=15, x0=[x0], random_state=42)
 
 # Resultados
 best_params = res.x
