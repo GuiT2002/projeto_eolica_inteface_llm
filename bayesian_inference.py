@@ -6,9 +6,11 @@ from iea37_aepcalc import calcAEP, getTurbLocYAML, getWindRoseYAML, getTurbAtrbt
 from plot import plot_solution, plot_fitness, save_logbook_to_csv
 import multiprocessing
 import time
+import csv
 from skopt import gp_minimize
 from skopt.space import Real, Integer
 from skopt.utils import use_named_args
+from time_callback import TimeCallback
 
 # Definindo o tipo de problema (Maximização)
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))
@@ -85,20 +87,21 @@ def evaluate(individual):
 
 # Definindo o espaço de busca
 space = [
-    Real(0.5, 0.9, name='cxpb'),
-    Real(0.3, 0.5, name='mutpb'),
-    Integer(100, 500, name='pop'),
-    Integer(2, 6, name='torneio'),
-    Real(0.4, 0.75, name='alpha'),
-    Integer(600, 2000, name='gerações'),
-    Real(0.1, 0.4, name='indpb'),
-    Integer(10, 150, name='sigma')
+    Real(0.7, 0.9, name='cxpb'),  # Varie cxpb
+    Real(0.1, 0.4, name='indpb'),  # Varie indpb
 ]
 
 # Função principal do algoritmo genético
-def main(cxpb, mutpb, pop, torneio, alpha, gerações, indpb, sigma):
+def main(cxpb, indpb):
     random.seed(42)
-    start_time = time.time()
+
+    # Parâmetros fixos
+    pop = 300
+    torneio = 5
+    alpha = 0.5
+    gen = 1000
+    sigma = 100
+    mutpb = 0.35
 
     pool = multiprocessing.Pool()
     toolbox.register("map", pool.map)
@@ -115,8 +118,8 @@ def main(cxpb, mutpb, pop, torneio, alpha, gerações, indpb, sigma):
     stats.register("min", np.min)
     stats.register("max", np.max)
 
-    pop, logbook = algorithms.eaSimple(pop, toolbox, cxpb=cxpb, mutpb=mutpb, ngen=gerações, 
-                                        stats=stats, halloffame=hof, verbose=True)
+    pop, logbook = algorithms.eaSimple(pop, toolbox, cxpb=cxpb, mutpb=mutpb, ngen=gen, 
+                                        stats=stats, halloffame=hof, verbose=False)
     
     pool.close()
     pool.join()
@@ -124,33 +127,27 @@ def main(cxpb, mutpb, pop, torneio, alpha, gerações, indpb, sigma):
     best_individual = hof[0]
     best_coords = np.array(best_individual).reshape((IND_SIZE, 2))
     aep = evaluate(best_individual)[0]
-    
-    end_time = time.time()
-    total_min = int((end_time - start_time)//60)
-    total_sec = int((end_time - start_time)%60)
-    print(f"Melhor AEP: {aep} MWh")
-    print(f"Tempo de computação: {total_min}:{total_sec}")
+
+    print(f"AEP: {aep} MWh")
 
     return aep
 
 # Função objetivo para a inferência bayesiana
 @use_named_args(space)
-def objective(cxpb, mutpb, pop, torneio, alpha, gerações, indpb, sigma):
-    return -main(cxpb, mutpb, pop, torneio, alpha, gerações, indpb, sigma)
+def objective(cxpb, indpb):
+    return -main(cxpb, indpb)
 
-x0 = [0.85, 0.35, 300, 5, 0.5, 600, 0.2, 100]
+# Callback para monitorar o tempo e salvar os parâmetros em CSV
+total_calls = 15  # Número total de chamadas
+callback = TimeCallback(total_calls, csv_file='hyperparameters_aep_log.csv')
+
+x0 = [0.85, 0.2]  # Valores iniciais para cxpb e indpb
 
 # Otimização
-res = gp_minimize(objective, space, n_calls=15, x0=[x0], random_state=42)
+res = gp_minimize(objective, space, n_calls=total_calls, x0=[x0], random_state=42, callback=[callback])
 
 # Resultados
 best_params = res.x
 print("Melhores parâmetros sugeridos:")
-print(f"cxpb = {best_params[0]:.4f},")
-print(f"mutpb = {best_params[1]:.4f},")
-print(f"pop = {best_params[2]},")
-print(f"Torneio = {best_params[3]},")
-print(f"Alpha = {best_params[4]:.4f},")
-print(f"Gerações = {best_params[5]},")
-print(f"indpb = {best_params[6]:.4f},")
-print(f"Sigma = {best_params[7]},")
+print(f"cxpb = {best_params[0]:.5f},")
+print(f"indpb = {best_params[1]:.5f},")

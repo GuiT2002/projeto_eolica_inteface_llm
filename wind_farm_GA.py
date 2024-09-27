@@ -87,8 +87,8 @@ def mutate(individual, mu, sigma, indpb):
 
 # Operadores genéticos
 toolbox.register("mate", tools.cxBlend, alpha=0.5)
-toolbox.register("mutate", mutate, mu=0, sigma=78, indpb=0.2222) 
-toolbox.register("select", tools.selTournament, tournsize=4)
+toolbox.register("mutate", mutate, mu=0, sigma=100, indpb=0.2) 
+toolbox.register("select", tools.selTournament, tournsize=5)
 toolbox.register("evaluate", evaluate)
 
 # Configuração da otimização
@@ -102,7 +102,7 @@ def main():
     
     # Configura o ambiente DEAP
     toolbox.register("map", pool.map)  
-    pop = toolbox.population(n=275)  # Tamanho da população
+    pop = toolbox.population(n=300)  # Tamanho da população
     hof = tools.HallOfFame(1)  # Manter o melhor indivíduo
     stats = tools.Statistics(lambda ind: ind.fitness.values)
     stats.register("avg", np.mean)
@@ -114,7 +114,7 @@ def main():
     max_fitness_data = []
 
     # Loop principal de otimização
-    pop, logbook = algorithms.eaSimple(pop, toolbox, cxpb=0.7972, mutpb=0.3778, ngen=1666, 
+    pop, logbook = algorithms.eaSimple(pop, toolbox, cxpb=0.85, mutpb=0.35, ngen=1500, 
                                         stats=stats, halloffame=hof, verbose=True)
     
     # Fechando o pool para liberar os recursos
@@ -137,9 +137,9 @@ def main():
     print("Coordenadas Y:", y_coords)
 
     # Plotar a solução e a evolução da aptidão
-    #plot_solution(x_coords, y_coords)
+    plot_solution(x_coords, y_coords)
     #plot_fitness(generation_data[3:], max_fitness_data[3:])
-    #save_logbook_to_csv(logbook, "set_18")
+    #save_logbook_to_csv(logbook, "set_19")
 
     end_time = time.time()
     total_min = int((end_time - start_time)//60)
