@@ -18,13 +18,13 @@ def create_individual_from_coordinates(coords):
     individual = creator.Individual(np.array(coords).flatten().tolist())
     return individual
 
-initial_coordinates, _, _ = getTurbLocYAML('iea37-ex16.yaml')
+initial_coordinates, _, _ = getTurbLocYAML('iea37-ex64.yaml')
 toolbox.register("individual", create_individual_from_coordinates, coords=initial_coordinates.tolist())
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
 # Parâmetros do problema
-IND_SIZE = 16  # Número de turbinas
-CIRCLE_RADIUS = 1300  # Raio do círculo
+IND_SIZE = 64  # Número de turbinas
+CIRCLE_RADIUS = 3000  # Raio do círculo
 N_DIAMETERS = 260  # 2 diâmetros de distância no mínimo
 
 
@@ -50,7 +50,7 @@ def mutate(individual, mu, sigma, indpb):
 
 # Função de avaliação
 def evaluate(individual):
-    turb_coords, fname_turb, fname_wr = getTurbLocYAML("iea37-ex16.yaml")
+    turb_coords, fname_turb, fname_wr = getTurbLocYAML("iea37-ex64.yaml")
     turb_ci, turb_co, rated_ws, rated_pwr, turb_diam = getTurbAtrbtYAML("iea37-335mw.yaml")
     wind_dir, wind_freq, wind_speed = getWindRoseYAML("iea37-windrose.yaml")
 
@@ -77,12 +77,12 @@ def evaluate(individual):
     return fitness,
 
 # Parâmetros para testar
-cxpb_values = [i / 100.0 for i in range(90, 101, 5)]    # 0.90 a 1.00
-indpb_values = [i / 100.0 for i in range(35, 56, 5)]    # 0.35 a 0.55
-mutpb_values = [i / 100.0 for i in range(50, 56, 5)]    # 0.50 a 0.55
+#cxpb_values = [i / 100.0 for i in range(50, 81, 5)]    # 0.50 a 0,80
+indpb_values = [i / 100.0 for i in range(50, 101, 5)]    # 0.55 a 0.85
+mutpb_values = [i / 100.0 for i in range(65, 101, 5)]    # 0.40 a 0.55
 
 # Função principal do algoritmo genético
-def main(cxpb, indpb, mutpb):
+def main(indpb, mutpb):
     random.seed(42)
 
     pop = 300
@@ -90,6 +90,7 @@ def main(cxpb, indpb, mutpb):
     alpha = 0.5
     gen = 300
     sigma = 100
+    cxpb = 0.8
 
     pool = multiprocessing.Pool()
     toolbox.register("map", pool.map)
@@ -123,25 +124,36 @@ def main(cxpb, indpb, mutpb):
 
 # Testando combinações de parâmetros
 results = []
-for cxpb in cxpb_values:
-    for indpb in indpb_values:
-        for mutpb in mutpb_values:
-            aep = main(cxpb, indpb, mutpb)
-            results.append((cxpb, indpb, mutpb, aep))
-            print(f"CXPB: {cxpb:.2f}, INDPB: {indpb:.2f}, MUTPB: {mutpb:.2f} AEP: {aep:.2f} MWh")
-            # Salvando os resultados em um arquivo CSV
-            with open('results.csv', 'w', newline='') as csvfile:
-                writer = csv.writer(csvfile)
-                writer.writerow(['CXPB', 'INDPB', 'MUTPB', 'AEP'])
-                writer.writerows(results)
+for indpb in indpb_values:
+    for mutpb in mutpb_values:
+        aep = main(indpb, mutpb)
+        results.append((indpb, mutpb, aep))
+        print(f"INDPB: {indpb:.2f}, MUTPB: {mutpb:.2f} AEP: {aep:.2f} MWh")
+        # Salvando os resultados em um arquivo CSV
+        with open('results.csv', 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(['INDPB', 'MUTPB', 'AEP'])
+            writer.writerows(results)
 
 # Exibindo os melhores resultados
-best_result = max(results, key=lambda x: x[3])
+best_result = max(results, key=lambda x: x[2])
 print("Melhores parâmetros sugeridos:")
-print(f"cxpb = {best_result[0]:.2f},")
-print(f"indpb = {best_result[1]:.2f}")
-print(f"mutpb = {best_result[2]:.2f}")
-print(f"AEP = {best_result[3]:.6f} MWh")
+#print(f"cxpb = {best_result[0]:.2f},")
+print(f"indpb = {best_result[0]:.2f}")
+print(f"mutpb = {best_result[1]:.2f}")
+print(f"AEP = {best_result[2]:.6f} MWh")
 
 
-#CXPB: 0.90, INDPB: 0.35, MUTPB: 0.50 AEP: 415939.54 MWh
+#1513311G
+#1506388G
+#1480850G
+
+#1479753 4° lugar
+
+#1476689G
+#1455075GF
+#1445967G
+#1422268GF
+#1364943GF
+#1336164GG
+#1332883GF

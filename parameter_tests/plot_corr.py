@@ -4,7 +4,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 # Lendo os dados do arquivo CSV
-df = pd.read_csv('parameter_tests/hyper.csv')
+df = pd.read_csv('hyper.csv')
 
 # Calculando a correlação
 correlation_matrix = df.corr()
@@ -14,8 +14,8 @@ plt.figure(figsize=(10, 8))
 sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', linewidths=0.5, fmt='.2f')
 
 # Título e exibição
-plt.title('Mapa de Correlação entre Parâmetros e AEP', fontsize=16)
-plt.savefig("parameter_tests/Mapa_de_correlação.png", dpi=300)
+plt.title('Correlation between parameters and AEP', fontsize=16)
+plt.savefig("Mapa_de_correlação.png", dpi=300)
 
 plt.show()
 

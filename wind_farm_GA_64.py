@@ -15,8 +15,8 @@ creator.create("Individual", list, fitness=creator.FitnessMax)
 toolbox = base.Toolbox()
 
 # Parâmetros
-IND_SIZE = 36  # Número de turbinas
-CIRCLE_RADIUS = 2000  # Raio do círculo
+IND_SIZE = 64  # Número de turbinas
+CIRCLE_RADIUS = 3000  # Raio do círculo
 N_DIAMETERS = 260  # 2 diâmetros de distância no mínimo
 
 def create_individual_from_coordinates(coords):
@@ -24,7 +24,7 @@ def create_individual_from_coordinates(coords):
     return individual
 
 # Carregando coordenadas iniciais
-initial_coordinates, _, _ = getTurbLocYAML('iea37-ex36.yaml')
+initial_coordinates, _, _ = getTurbLocYAML('iea37-ex64.yaml')
 toolbox.register("individual", create_individual_from_coordinates, coords=initial_coordinates.tolist())
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
@@ -44,7 +44,7 @@ def enforce_circle(individual):
 # Função de avaliação
 def evaluate(individual):
     # Carregando os dados dos arquivos YAML
-    turb_coords, fname_turb, fname_wr = getTurbLocYAML("iea37-ex36.yaml")
+    turb_coords, fname_turb, fname_wr = getTurbLocYAML("iea37-ex64.yaml")
     turb_ci, turb_co, rated_ws, rated_pwr, turb_diam = getTurbAtrbtYAML("iea37-335mw.yaml")
     wind_dir, wind_freq, wind_speed = getWindRoseYAML("iea37-windrose.yaml")
 
@@ -87,7 +87,7 @@ def mutate(individual, mu, sigma, indpb):
 
 # Operadores genéticos
 toolbox.register("mate", tools.cxBlend, alpha=0.5)
-toolbox.register("mutate", mutate, mu=0, sigma=100, indpb=0.55) 
+toolbox.register("mutate", mutate, mu=0, sigma=100, indpb=0.4) 
 toolbox.register("select", tools.selTournament, tournsize=5)
 toolbox.register("evaluate", evaluate)
 
@@ -114,7 +114,7 @@ def main():
     max_fitness_data = []
 
     # Loop principal de otimização
-    pop, logbook = algorithms.eaSimple(pop, toolbox, cxpb=0.95, mutpb=0.55, ngen=1500, 
+    pop, logbook = algorithms.eaSimple(pop, toolbox, cxpb=0.8, mutpb=0.75, ngen=1000, 
                                         stats=stats, halloffame=hof, verbose=True)
     
     # Fechando o pool para liberar os recursos
@@ -168,7 +168,7 @@ if __name__ == "__main__":
 #13 cxpb=0.85,    mutpb=0.35, pop=300,    torneio=5,  alpha=0.5,  gen=500,     indpb=0.2,     sigma=100,  -> ~415203MWh
 #14 cxpb=0.85,    mutpb=0.35, pop=500,    torneio=5,  alpha=0.5,  gen=500,     indpb=0.2,     sigma=100,  -> ~411113MWh
 #15 cxpb=0.85,    mutpb=0.35, pop=400,    torneio=5,  alpha=0.5,  gen=500,     indpb=0.2,     sigma=100,  -> ~412403MWh
-#16 cxpb=0.85,    mutpb=0.35, pop=300,    torneio=5,  alpha=0.5,  gen=3000,    indpb=0.2,     sigma=100,  -> ~415289MWh - winner
+#16 cxpb=0.85,    mutpb=0.35, pop=300,    torneio=5,  alpha=0.5,  gen=3000,    indpb=0.2,     sigma=100,  -> ~415289MWh
 #17 cxpb=0.85,    mutpb=0.35, pop=350,    torneio=5,  alpha=0.5,  gen=2500,    indpb=0.2,     sigma=100,  -> ~410840MWh
 #18 cxpb=0.85,    mutpb=0.35, pop=300,    torneio=6,  alpha=0.5,  gen=1000,    indpb=0.2,     sigma=100,  -> ~408632MWh
 
