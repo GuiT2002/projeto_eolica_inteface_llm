@@ -2,7 +2,7 @@ from groq import Groq
 import re
 import wind_farm_GA_16 as simulador
 
-client = Groq(api_key='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')
+client = Groq(api_key='GROQ_API_KEY')
 
 system_prompt = """
 
@@ -139,5 +139,6 @@ N_DIAMETERS:                 {n_diameters} m\033[0m""")
     user_input = str(input("\nUsuário: "))
 
     messages.append({"role": "user", "content": user_input})
+
 
 
