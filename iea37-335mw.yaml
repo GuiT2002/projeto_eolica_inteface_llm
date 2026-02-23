@@ -13,7 +13,7 @@ definitions:
       wind_turbine_id:
         type: string
         description: identifer of wind turbine for look-up
-        default: 335MW
+        default: 335MW 
         
       operating_mode_id:
         type: identifer of operating model for look-up
@@ -31,14 +31,14 @@ definitions:
         type: number
         description: The current power coefficient of the wind turbine
         minimum: 0.0
-        maximum: 0.481
+        maximum: 0.481 
 
       power:
         type: number
         description: The wind turbine electrical power
         units: W
         minimum: 0.0
-        maximum: 3350000.0
+        maximum: 3350000.0 # mudar de acordo com especificação do engenheiro (potencia nominal)
 
   # turbine definition
   wind_turbine:
@@ -89,7 +89,7 @@ definitions:
         type: number
         description: The rotor radius
         units: m
-        default: 65.0
+        default: 65.0 # mudar de acordo com especificação do engenheiro (raio do rotor)
 
       area:
         type: number
@@ -107,7 +107,7 @@ definitions:
         type: number
         description: The hub height
         units: m
-        default: 110.0
+        default: 110.0 # mudar de acordo com especificação do engenheiro (altura será raio do rotor * 1.2)
 
   # operating mode can vary and the power/thrust curves will change as a result
   operating_mode:
@@ -127,7 +127,7 @@ definitions:
       cut_in_wind_speed:
         type: number
         description: The starting wind speed of the wind turbine
-        default: 4.0
+        default: 4.0 # mudar de acordo com especificação do engenheiro
         minimum: 0.0
         maximum: 100.0
         expr_max: cut_out_wind_speed
@@ -137,7 +137,7 @@ definitions:
         description: The stopping wind speed of the wind turbine
         type: number
         units: m/s
-        default: 25.0
+        default: 25.0 # mudar de acordo com especificação do engenheiro
         expr_min: rated_wind_speed
         minimum: 0.0
         maximum: 100.0
@@ -146,7 +146,7 @@ definitions:
         type: number
         description: The wind speed where the turbine reaches its rated power
         units: m/s
-        default: 9.8
+        default: 9.8 # mudar de acordo com especificação do engenheiro
         minimum: 0.0
         expr_min: cut_in_wind_speed
         maximum: 100.0

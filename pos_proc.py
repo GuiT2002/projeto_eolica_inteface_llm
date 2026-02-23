@@ -7,6 +7,7 @@ import os
 import numpy as np
 import pandas as pd
 import cabling # Importa nosso módulo refatorado
+import matplotlib.pyplot as plt
 
 # =============================================================================
 # FUNÇÕES HELPER
@@ -74,6 +75,62 @@ def identificar_arquetipos(df):
         'joelho': idx_joelho
     }
 
+def plotar_frente_de_pareto_enriquecida(df, arquetipos_idx, output_dir):
+    """
+    Gera um gráfico da Frente de Pareto de alta qualidade para publicação,
+    destacando os 3 layouts arquétipo.
+    """
+    # Extrai as séries de dados para facilitar o acesso
+    aep = df['AEP_Liquido_MWh']
+    cost = df['Custo_USD'] / 1e6 # Convertido para Milhões de USD
+
+    # Extrai os dados dos 3 arquétipos
+    max_aep_sol = df.loc[arquetipos_idx['max_aep']]
+    min_cost_sol = df.loc[arquetipos_idx['min_cost']]
+    joelho_sol = df.loc[arquetipos_idx['joelho']]
+
+    plt.figure(figsize=(12, 9))
+
+    # 1. Plota a população geral de forma sutil
+    plt.scatter(cost, aep, c='gray', alpha=0.5, label='Soluções da Frente de Pareto')
+
+    # 2. Plota os arquétipos com destaque
+    plt.scatter(min_cost_sol['Custo_USD']/1e6, min_cost_sol['AEP_Liquido_MWh'],
+                c='green', s=150, edgecolor='black', marker='D', label='Arquétipo: Custo Mínimo')
+    
+    plt.scatter(max_aep_sol['Custo_USD']/1e6, max_aep_sol['AEP_Liquido_MWh'],
+                c='red', s=150, edgecolor='black', marker='s', label='Arquétipo: AEP Máximo')
+
+    plt.scatter(joelho_sol['Custo_USD']/1e6, joelho_sol['AEP_Liquido_MWh'],
+                c='orange', s=200, edgecolor='black', marker='*', label='Arquétipo: Joelho (Compromisso)')
+
+    # 3. Adiciona anotações de texto (opcional, mas muito eficaz)
+    plt.text(min_cost_sol['Custo_USD']/1e6 * 1.01, min_cost_sol['AEP_Liquido_MWh'] - 500,
+            f"Custo Min.\n${min_cost_sol['Custo_USD']/1e6:.3f} mi",
+            fontsize=10, color='darkgreen', weight='bold')
+            
+    plt.text(max_aep_sol['Custo_USD']/1e6 * 0.98, max_aep_sol['AEP_Liquido_MWh'] + 300,
+            f"AEP Max.\n{max_aep_sol['AEP_Liquido_MWh']:,.0f} MWh",
+            fontsize=10, color='darkred', weight='bold', ha='right')
+            
+    plt.text(joelho_sol['Custo_USD']/1e6, joelho_sol['AEP_Liquido_MWh'] + 500,
+            f"Joelho",
+            fontsize=10, color='darkorange', weight='bold', ha='center')
+
+    # 4. Polimento final do gráfico
+    plt.title('Frente de Pareto: Análise de Trade-off entre AEP e Custo', fontsize=18, weight='bold')
+    plt.xlabel('Custo Total do Cabeamento (Milhões de USD)', fontsize=14)
+    plt.ylabel('AEP Líquido (MWh/ano)', fontsize=14)
+    plt.legend(fontsize=12)
+    plt.grid(True, linestyle='--', alpha=0.6)
+    plt.tight_layout()
+    
+    # Salva a figura
+    output_path = os.path.join(output_dir, "pareto_front_enriquecido.png")
+    plt.savefig(output_path, dpi=300)
+    print(f"Gráfico enriquecido da Frente de Pareto salvo em: '{output_path}'")
+    plt.close()
+
 # =============================================================================
 # SCRIPT PRINCIPAL
 # =============================================================================
@@ -116,7 +173,7 @@ def main():
         print(f"Processando '{nome_arquetipo}' (Solução #{solucao['Solution']})...")
         
         # Carregar as coordenadas
-        coord_path = os.path.join(INPUT_DIR, solucao['File'])
+        coord_path = solucao['File']
         coords = load_custom_coords(coord_path)
         
         # Determinar a subestação (turbina mais próxima do continente)
@@ -138,6 +195,9 @@ def main():
 
     print("\nProcesso concluído com sucesso!")
     print(f"As imagens dos 3 layouts arquétipo foram salvas em '{OUTPUT_DIR}/'.")
+
+    print("\n--- Gerando gráfico enriquecido da Frente de Pareto ---")
+    plotar_frente_de_pareto_enriquecida(df_pareto, arquetipos_idx, OUTPUT_DIR)
 
 if __name__ == "__main__":
     main()
